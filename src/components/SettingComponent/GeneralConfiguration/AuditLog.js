@@ -1,52 +1,58 @@
 import React from 'react';
 import { Table, Divider, Modal, Button, Icon, Upload, DatePicker, Input, Col, Row ,Dropdown,Menu,message} from 'antd';
 import Export from './Export';
+import axios from 'axios';
 import {
     Breadcrumb
 } from 'antd';
+import Axios from 'axios';
 const { RangePicker } = DatePicker;
 
 const Search = Input.Search;
-const data = [
-    {
-      key: '1',
-      date: 'John Brown',
-      author: 'John',
-      category: 'New York No. 1 Lake Park',
-      summary:'New York No. 1 Lake Park'
+// const data = [
+//     {
+//       key: '1',
+//       date: 'John Brown',
+//       author: 'John',
+//       category: 'New York No. 1 Lake Park',
+//       summary:'New York No. 1 Lake Park'
 
-    },
-    {
-      key: '2',
-      date: 'Jim Green',
-      author: 'Jim',
-      category: 'London No. 1 Lake Park',
-      summary:'New York No. 1 Lake Park'
-    },
-    {
-      key: '3',
-      date: 'Joe Black',
-      author: 'Joe',
-      category: 'Sidney No. 1 Lake Park',
-      summary:'New York No. 1 Lake Park'
-    },
-    {
-      key: '4',
-      date: 'Jim Red',
-      author: 'Jim',
-      category: 'London No. 2 Lake Park',
-      summary:'New York No. 1 Lake Park'
-    },
-  ];
+//     },
+//     {
+//       key: '2',
+//       date: 'Jim Green',
+//       author: 'Jim',
+//       category: 'London No. 1 Lake Park',
+//       summary:'New York No. 1 Lake Park'
+//     },
+//     {
+//       key: '3',
+//       date: 'Joe Black',
+//       author: 'Joe',
+//       category: 'Sidney No. 1 Lake Park',
+//       summary:'New York No. 1 Lake Park'
+//     },
+//     {
+//       key: '4',
+//       date: 'Jim Red',
+//       author: 'Jim',
+//       category: 'London No. 2 Lake Park',
+//       summary:'New York No. 1 Lake Park'
+//     },
+//   ];
   
 
 class AuditLog extends React.Component {
-
-    state = {
+  constructor(props) {
+    super(props);
+   this.state = {
         visible: false,
-        visibleEditModal: false
+        visibleEditModal: false,
+        Data :[]
       };
-    
+      
+
+    }
       showModal = () => {
         this.setState({
           visible: true,
@@ -96,11 +102,30 @@ class AuditLog extends React.Component {
       onChange(pagination, filters, sorter) {
         console.log('params', pagination, filters, sorter);
       }
+
+
+getAudit(){
+  axios.get('http://localhost:8081/defect/auditLogAll')
+  .then(resp => {
+
+    let Data=resp.data;
+
+    this.setState({Data});
+
+    console.log(Data);
+});
+ 
+}
+
+componentDidMount(){
+  this.getAudit();
+}
+
     render() {
         const columns = [
             {
               title: 'Date/Time',
-              dataIndex: 'date',
+              dataIndex: 'fixDate',
               filters: [
                 {
                   text: 'Joe',
@@ -132,13 +157,18 @@ class AuditLog extends React.Component {
               sortDirections: ['descend'],
             },
             {
-              title: 'Author',
-              dataIndex: 'author',
+              title: 'User',
+              dataIndex: 'user',
               
             },
             {
-              title: 'Work category',
-              dataIndex: 'category',
+              title: 'AuditId',
+              dataIndex: 'auditId',
+              
+            },
+            {
+              title: 'Status',
+              dataIndex: 'status',
               filters: [
                 {
                   text: 'London',
@@ -156,8 +186,8 @@ class AuditLog extends React.Component {
               sortDirections: ['descend', 'ascend'],
             },
             {
-                title: 'Summary',
-                dataIndex: 'summary',
+                title: 'defectId',
+                dataIndex: 'defectId',
                 
               },
             {
@@ -235,7 +265,7 @@ class AuditLog extends React.Component {
       </Col>
     </Row>
     <br></br>
-               <Table columns={columns} dataSource={data}/>
+               <Table columns={columns} dataSource={this.state.Data} />
                <Modal
             title=" Log Details"
             visible={this.state.visible}
